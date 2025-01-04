@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 
+
 // property route here
 const propertyRoutes = require('./src/routes/propertyRoutes');
 app.use('/property' , propertyRoutes);
