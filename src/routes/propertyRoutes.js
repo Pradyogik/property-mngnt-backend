@@ -35,11 +35,11 @@ router.post('/', generatePropertyUniqueId, (req, res) => {
     formData["area_square_meter"], formData["possession_date"], formData["additional_land_amount"],
     formData["restoration_charges"], formData["certificate_charges"], formData["service_charges_financial_year"],
     formData["service_charges_amount"], formData["service_charges_late_fee"], formData["service_charges_date"],
-    formData["registration_charges"], formData["registration_date_2"], formData["transfer_name"],
-    formData["transferors_fathers_husbands_name"], formData["address"], formData["inheritance"],
-    formData["transfer_fee"], formData["documentation_fee"], formData["transfer_date"],
-    formData["building_plan_approval_date"], formData["building_construction"], formData["deposit_date"],
-    formData["receipt_number"], formData["change_fee"], formData["advertisement_fee"]
+    formData["registrationCharges"], formData["registrationDate2"], formData["transferName"],
+    formData["transferorFatherHusbandName"], formData["transferorAddress"], formData["inheritance"],
+    formData["transferCharges"], formData["documentationCharges"], formData["transferDate"],
+    formData["buildingPlanApprovalDate"], formData["buildingConstruction"], formData["depositDateReceiptNumber"],
+    formData["receipt_number"], formData["changeCharges"], formData["advertisementFee"]
   ];
 
   pool.query(propertyQuery, propertyValues, (err, propertyResult) => {
