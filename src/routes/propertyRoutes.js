@@ -25,9 +25,9 @@ router.post('/', generatePropertyUniqueId, (req, res) => {
     ) VALUES (?,? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   const propertyValues = [
-    formData["serialNumber"], formData["schemeName"], formData["propertyUniqueId"], formData["allotteName"],
+    formData["serialNumber"], formData["schemeName"], formData["propertyId"], formData["allotteName"],
     formData["fatherHusbandName"], formData["permanentAddress"], formData["currentAddress"],
-    formData["mobileNumber"], formData["PropertyCategory"], formData["propertyNumber"],
+    formData["mobileNumber"], formData["propertyCategory"], formData["propertyNumber"],
     formData["registrationAmount"], formData["registrationDate"], formData["allotmentAmount"],
     formData["allotmentDate"], formData["salePrice"], formData["freeholdAmount"],
     formData["leaseRentAmount"], formData["parkCharge"], formData["cornerCharge"],
@@ -121,6 +121,157 @@ router.post('/', generatePropertyUniqueId, (req, res) => {
   });
 });
 
+
+router.get('/', (req, res) => {
+  const query = `
+    SELECT 
+      p.*,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'installment_date', i.installment_date,
+          'delayed_interest_amount', i.delayed_interest_amount,
+          'installment_interest_amount', i.installment_interest_amount,
+          'installment_payment_amount', i.installment_payment_amount
+        )
+      ) AS installments,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'service_charges_date', s.service_charges_date,
+          'service_charges_late_fee', s.service_charges_late_fee,
+          'service_charge_amount', s.service_charge_amount,
+          'service_charge_financial_year', s.service_charge_financial_year
+        )
+      ) AS service_charges
+    FROM 
+      property p
+    LEFT JOIN 
+      installments i ON p.id = i.property_id
+    LEFT JOIN 
+      service_charge s ON p.id = s.property_id
+    GROUP BY 
+      p.id;
+  `;
+
+  pool.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching data:', err);
+      return res.status(500).send('Error fetching data from the database');
+    }
+
+    // Parse JSON strings into JavaScript arrays
+    const formattedResults = results.map((row) => ({
+      ...row,
+      installments: JSON.parse(row.installments || '[]'),
+      service_charges: JSON.parse(row.service_charges || '[]'),
+    }));
+
+    res.status(200).json({
+      message: 'Data fetched successfully',
+      data: formattedResults,
+    });
+  });
+});
+
+
+
+// first data from table
+// router.get('/', (req, res) => {
+//   const query = `
+//     SELECT 
+//   p.*,
+//   i.installment_date, 
+//   i.delayed_interest_amount, 
+//   i.installment_interest_amount, 
+//   i.installment_payment_amount,
+//   s.service_charges_date, 
+//   s.service_charges_late_fee, 
+//   s.service_charge_amount, 
+//   s.service_charge_financial_year
+// FROM 
+//   property p
+// LEFT JOIN 
+//   installments i ON p.id = i.property_id 
+// LEFT JOIN 
+//   service_charge s ON p.id = s.property_id; 
+//   `;
+
+//   pool.query(query, (err, results) => {
+//     if (err) {
+//       console.error('Error fetching data:', err);
+//       return res.status(500).json({message: 'Error fetching data from the database' , errorMsg: err})
+//     }
+
+//     // Group data by property_id for a structured response
+//     const groupedData = results.reduce((acc, row) => {
+//       const propertyId = row.property_id;
+
+//       if (!acc[propertyId]) {
+//         acc[propertyId] = {
+//           property: {
+//             ...row,
+//             property_id: propertyId,
+//           },
+//           installments: [],
+//           serviceCharges: []
+//         };
+//       }
+
+//       // Add installments data
+//       if (row.installment_date) {
+//         acc[propertyId].installments.push({
+//           installment_date: row.installment_date,
+//           delayed_interest_amount: row.delayed_interest_amount,
+//           installment_interest_amount: row.installment_interest_amount,
+//           installment_payment_amount: row.installment_payment_amount
+//         });
+//       }
+
+//       // Add service charges data
+//       if (row.installment_date) {
+//         acc[propertyId].serviceCharges.push({
+//           service_charges_date: row.service_charges_date,
+//           service_charges_late_fee: row.service_charges_late_fee,
+//           service_charge_amount: row.service_charge_amount,
+//           service_charge_financial_year: row.service_charge_financial_year
+//         });
+//       }
+
+//       return acc;
+//     }, {});
+
+//     // Convert grouped data object to an array
+//     const responseData = Object.values(groupedData);
+
+//     res.status(200).json({
+//       message: 'Data fetched successfully',
+//       data: responseData,
+//     });
+//   });
+// });
+
+// old get route
+// router.get('/', (req, res) => {
+//     const query = 'SELECT * FROM property';
+  
+//     pool.query(query, (err, results) => {
+//       if (err) {
+//         console.error('Error fetching data:', err);
+//         return res.status(500).send('Error fetching data from the database');
+//       }
+  
+//       res.status(200).json({
+//         message: 'Data fetched successfully',
+//         data: results,
+//       });
+//     });
+//   });
+
+module.exports = router;
+
+
+
+
+// old code 
 
 // router.post('/', generatePropertyUniqueId, (req, res) => {
 //   const formData = req.body; // This contains the form data as an object
@@ -698,24 +849,3 @@ router.post('/', generatePropertyUniqueId, (req, res) => {
 // });
 
 // GET route to fetch all data from the property table--
-
-
-
-
-router.get('/', (req, res) => {
-    const query = 'SELECT * FROM property';
-  
-    pool.query(query, (err, results) => {
-      if (err) {
-        console.error('Error fetching data:', err);
-        return res.status(500).send('Error fetching data from the database');
-      }
-  
-      res.status(200).json({
-        message: 'Data fetched successfully',
-        data: results,
-      });
-    });
-  });
-
-module.exports = router;
