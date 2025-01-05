@@ -1,21 +1,4 @@
-// const generatePropertyUniqueId = (req, res, next) => {
-//     const { schemeName, registrationDate } = req.body;
-  
-//     if (!schemeName || !registrationDate) {
-//       return res.status(400).send('Scheme Name and Registration Date are required to generate Property Unique ID');
-//     }
-  
-//     const schemePrefix = schemeName.substring(0, 3).toUpperCase(); // First 3 characters of scheme_name
-//     const date = new Date(registrationDate);
-//     const yearMonth = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}`; // Year and month in YYYYMM format
-//     const uniqueId = `${schemePrefix}${yearMonth}001`; // Concatenate scheme prefix, yearMonth, and "001"
-  
-//     req.body.propertyId = uniqueId; // Add the generated ID to the request body
-  
-//     next(); // Pass control to the next middleware/route
-//   };
 
-//   module.exports = generatePropertyUniqueId
 
 const pool = require('../utils/pool');
 

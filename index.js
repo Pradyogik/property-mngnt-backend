@@ -26,8 +26,6 @@ app.listen(port , (err)=>{
     
 });
 
-
-// // create connection to mysql server
 // const connection = mysql.createConnection({
 //     host: '127.0.0.1',  //mysql server host
 //     user: 'root', //mysql username
