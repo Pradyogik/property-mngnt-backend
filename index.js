@@ -18,6 +18,11 @@ const propertyRoutes = require('./src/routes/propertyRoutes');
 app.use('/property' , propertyRoutes);
 
 
+// for new property routes
+const newPropertyRoutes = require('./src/routes/NewPropertyRoutes');
+app.use('/new-property' , newPropertyRoutes);
+  
+
 app.listen(port , (err)=>{
     if(err){
         console.log(`error in port ${port}`);
