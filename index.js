@@ -1,10 +1,13 @@
 const express = require('express');
 const app = express();
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const bodyParser = require('body-parser');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 const pool = require('./src/utils/pool');
-const cors = require('cors')
+const cors = require('cors');
+const xlsx = require("xlsx");
+// const mysql = require("mysql2");
+// const ex = require('')
 
 
 app.use(bodyParser.json());
@@ -23,6 +26,12 @@ const newPropertyRoutes = require('./src/routes/NewPropertyRoutes');
 app.use('/new-property' , newPropertyRoutes);
   
 
+// for auth routes
+const authRoutes = require('./src/routes/AuthRoute');
+app.use('/' , authRoutes);
+  
+
+
 app.listen(port , (err)=>{
     if(err){
         console.log(`error in port ${port}`);
@@ -32,42 +41,5 @@ app.listen(port , (err)=>{
     
 });
 
-// const connection = mysql.createConnection({
-//     host: '127.0.0.1',  //mysql server host
-//     user: 'root', //mysql username
-//     password: '373920' //mysql password
-// });
-
-// //connect to mysql server..
-// connection.connect((err)=>{
-//     if(err){
-//         console.error('error connecting to mysql server' , err);
-//         return
-//     }
-//     console.log('connected to mysql server');
-    
 
 
-// //create new db
-// const dbName = 'bida_db';
-// const createDBQuery = `CREATE DATABASE IF NOT EXISTS ${dbName}`;
-
-// connection.query(createDBQuery , (err,result)=>{
-//     if(err){
-//         console.error('error creating db', err);
-//         return;
-//     }
-//     console.log(`db ${dbName} connected successfully`);
-    
-// });
-
-// connection.end((err)=>{
-//     if(err){
-//         console.error('error closing connection', err);
-//         return;
-//     }
-//     console.log('connection closed');
-    
-// });
-
-// });
